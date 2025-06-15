@@ -33,7 +33,7 @@ jobs:
         run: npm ci
 
       - name: Build ADR documentation
-        run: npm run adr:build
+        run: npx log4brains build --basePath /preval
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
