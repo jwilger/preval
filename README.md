@@ -1,29 +1,42 @@
-# eval-tui
+# PrEval
 
 A cross-platform Terminal User Interface (TUI) for running and monitoring prompt evaluation tests. This tool provides an interactive interface for executing evaluation scripts, monitoring their progress in real-time, and analyzing results.
 
 ## Overview
 
-`eval-tui` is designed to work with any prompt evaluation system that outputs structured JSON Lines format. It provides:
+PrEval is designed to work with any prompt evaluation system that outputs OpenTelemetry metrics data. It provides:
 
-- Real-time progress monitoring with hierarchical sample/run display
-- Live comparison of current results vs. previous runs
-- Interactive exploration of evaluation details
+- Real-time progress monitoring with OpenTelemetry metrics display
+- Support for multiple concurrent evaluators
+- Test suite, online collection, and continuous monitoring modes
 - Cross-platform support (Linux, macOS, Windows)
 - Both interactive TUI and non-interactive CI modes
+
+## Architecture Documentation
+
+This project uses Architecture Decision Records (ADRs) to document important design decisions. You can browse our ADRs:
+
+- [View ADRs locally](http://localhost:4004) - Run `npm run adr:preview` after setting up the development environment
+- [View ADRs on GitHub Pages](https://johnwilger.github.io/preval/adr/) (once published)
+
+Key architectural decisions include:
+- Using OpenTelemetry for metrics protocol
+- Two-phase handshake protocol for coordination
+- Support for multiple concurrent evaluators
+- Language-agnostic evaluator interface
 
 ## Installation
 
 ### Pre-built Binaries
 
-Download the latest release for your platform from the [Releases](https://github.com/johnwilger/eval-tui/releases) page.
+Download the latest release for your platform from the [Releases](https://github.com/johnwilger/preval/releases) page.
 
 ### Building from Source
 
 ```bash
 # Clone the repository
-git clone https://github.com/johnwilger/eval-tui.git
-cd eval-tui
+git clone https://github.com/johnwilger/preval.git
+cd preval
 
 # Build for your current platform
 cargo build --release
@@ -37,14 +50,15 @@ make release-all
 ### Interactive Mode (Default)
 
 ```bash
-# Launch the TUI for interactive evaluation selection
-eval-tui
+# Launch PrEval for interactive evaluation selection
+preval
 
 # With specific AWS profile
-eval-tui --aws-profile nh-dev
+preval --aws-profile my-profile
 ```
 
 In interactive mode, you can:
+
 - Select evaluation type(s) to run
 - Choose between Fast (3 samples) or Full mode
 - Navigate results with keyboard shortcuts
@@ -56,23 +70,23 @@ When you specify evaluation options via command line, the TUI is automatically d
 
 ```bash
 # Run specific evaluation type without TUI
-eval-tui event_extraction
+preval event_extraction
 
 # Run in fast mode (3 samples, no TUI)
-eval-tui --fast
+preval --fast
 
 # Run specific type in fast mode
-eval-tui event_extraction --fast
+preval event_extraction --fast
 
 # Explicit non-interactive mode for CI
-eval-tui --no-tui
+preval --no-tui
 ```
 
 ### Custom Evaluators
 
 ```bash
 # Run a custom evaluator command
-eval-tui --evaluator "python my_custom_eval.py --json-output"
+preval --evaluator "python my_custom_eval.py --json-output"
 ```
 
 ## Architecture
@@ -81,7 +95,7 @@ The system follows a simple process model:
 
 ```
 ┌─────────────┐     JSON Lines      ┌──────────────┐
-│   eval-tui  │ ← ─ ─ ─ ─ ─ ─ ─ ─ ─ │  Evaluator   │
+│   PrEval    │ ← ─ ─ ─ ─ ─ ─ ─ ─ ─ │  Evaluator   │
 │   (Rust)    │     via stdout       │  (Any Lang)  │
 └─────────────┘                      └──────────────┘
       │
@@ -93,17 +107,24 @@ The system follows a simple process model:
 
 ## Evaluator Protocol
 
-Evaluators must output JSON Lines format (one JSON object per line) to stdout:
+PrEval uses a two-phase protocol for communication with evaluators:
 
+1. **Handshake Phase**: Initial JSON message describing the evaluation plan
+2. **Metrics Phase**: OpenTelemetry metrics data in JSON Lines format
+
+Example handshake:
+```json
+{
+  "type": "handshake",
+  "mode": "test_suite",
+  "evaluator": {"name": "my-eval", "description": "My evaluation"},
+  "execution_plan": {"total_samples": 50}
+}
+```
+
+Example metrics (OTLP/JSON format):
 ```jsonl
-{"type": "init", "total_samples": 50, "runs_per_sample": 10}
-{"type": "sample_start", "sample_id": 1, "expected_events": 3}
-{"type": "run_start", "sample_id": 1, "run_id": 1}
-{"type": "run_complete", "sample_id": 1, "run_id": 1, "status": "success", "metrics": {...}}
-{"type": "sample_complete", "sample_id": 1, "summary": {...}}
-{"type": "overall_update", "metrics": {...}, "vs_previous": {...}}
-{"type": "log", "level": "info", "message": "Processing sample..."}
-{"type": "complete", "final_metrics": {...}}
+{"resourceMetrics":[{"resource":{"attributes":[{"key":"service.name","value":{"stringValue":"my-eval"}}]},"scopeMetrics":[{"metrics":[{"name":"llm.eval.accuracy","gauge":{"dataPoints":[{"asDouble":0.92,"attributes":[{"key":"sample.id","value":{"stringValue":"001"}}]}]}}]}]}]}
 ```
 
 See [PROTOCOL.md](PROTOCOL.md) for complete protocol documentation.
@@ -111,6 +132,7 @@ See [PROTOCOL.md](PROTOCOL.md) for complete protocol documentation.
 ## Keyboard Shortcuts
 
 In the TUI:
+
 - `↑/↓` - Navigate samples
 - `Enter` - Expand/collapse sample details
 - `Space` - View detailed sample information
@@ -122,6 +144,7 @@ In the TUI:
 ## Building for Multiple Platforms
 
 The project supports cross-compilation for:
+
 - `x86_64-unknown-linux-gnu`
 - `x86_64-apple-darwin`
 - `aarch64-apple-darwin` (Apple Silicon)

@@ -30,7 +30,7 @@ As a developer, I want to interactively choose which evaluations to run and thei
 
 ## Example Selection Screen
 ```
-┌─── eval-tui: Select Evaluation Options ─────────────────────┐
+┌─── PrEval: Select Evaluation Options ─────────────────────┐
 │                                                             │
 │  Evaluation Types:                                          │
 │  ☑ event_extraction     Extract events from text           │
@@ -50,7 +50,7 @@ As a developer, I want to interactively choose which evaluations to run and thei
 ```
 
 ## Interaction Flow
-1. Launch eval-tui with no arguments
+1. Launch preval with no arguments
 2. Selection screen appears
 3. User navigates with Tab between sections
 4. Space toggles checkboxes, arrow keys change radio buttons

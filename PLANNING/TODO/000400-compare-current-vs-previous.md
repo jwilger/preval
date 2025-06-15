@@ -22,7 +22,7 @@ As a developer iterating on prompts, I want to see how my current evaluation res
 ## Technical Notes
 - Load previous run data from stored results
 - Calculate deltas as current evaluation progresses
-- Store results in a consistent location (e.g., `~/.local/share/eval-tui/`)
+- Store results in a consistent location (e.g., `~/.local/share/preval/`)
 - Must handle different evaluation types separately
 - Consider statistical significance of changes
 - Update display smoothly without jarring transitions

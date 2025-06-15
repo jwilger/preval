@@ -32,7 +32,7 @@ As a CI/CD system or automation script, I want to run evaluations without any in
 ## Example CI Usage
 ```bash
 # In CI pipeline
-eval-tui --no-tui --output-dir=./test-results --timeout=20m
+preval --no-tui --output-dir=./test-results --timeout=20m
 
 # Exit codes:
 # 0 - All evaluations passed thresholds
@@ -72,7 +72,7 @@ Summary saved to: ./test-results/eval_20240115_143245_summary.json
 ```
 
 ## Configuration
-- Support .eval-tui.yml config file
-- Override with environment variables (EVAL_TUI_*)
+- Support .preval.yml config file
+- Override with environment variables (PREVAL_*)
 - Command-line flags take precedence
 - Document all options clearly

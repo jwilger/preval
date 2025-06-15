@@ -94,13 +94,13 @@ sample_id,sample_text,run_id,status,count_accuracy,date_accuracy,quality_score
 ## CLI Export Examples
 ```bash
 # Export during run
-eval-tui --export-format json --export-path ./data.json
+preval --export-format json --export-path ./data.json
 
 # Export only failures as CSV
-eval-tui --no-tui --export-format csv --export-filter "status:failed"
+preval --no-tui --export-format csv --export-filter "status:failed"
 
 # Multiple format export
-eval-tui --export-formats json,csv,parquet --export-dir ./exports/
+preval --export-formats json,csv,parquet --export-dir ./exports/
 ```
 
 ## Schema Documentation

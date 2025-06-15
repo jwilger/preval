@@ -68,7 +68,7 @@ $ event-extraction-eval --info
 
 ## Configuration Example
 ```yaml
-# .eval-tui.yml
+# .preval.yml
 evaluators:
   search_paths:
     - ~/.local/bin
