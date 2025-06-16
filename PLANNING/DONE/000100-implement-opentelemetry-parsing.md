@@ -9,12 +9,12 @@ As a developer, I want PrEval to parse OpenTelemetry metrics data from evaluator
 - Provides foundation for all metrics display features
 
 ## Acceptance Criteria
-- [ ] Parse OpenTelemetry JSON format (OTLP/JSON)
-- [ ] Extract metric data points with their attributes
-- [ ] Support gauge, counter, and histogram metric types
-- [ ] Handle streaming JSON Lines input (one ResourceMetrics per line)
-- [ ] Convert OpenTelemetry data to internal domain types
-- [ ] Properly handle parsing errors with clear messages
+- [x] Parse OpenTelemetry JSON format (OTLP/JSON)
+- [x] Extract metric data points with their attributes
+- [x] Support gauge, counter, and histogram metric types
+- [x] Handle streaming JSON Lines input (one ResourceMetrics per line)
+- [x] Convert OpenTelemetry data to internal domain types
+- [x] Properly handle parsing errors with clear messages
 
 ## Technical Notes
 - Use serde for deserialization of OTLP/JSON format
@@ -29,8 +29,8 @@ As a developer, I want PrEval to parse OpenTelemetry metrics data from evaluator
 ```
 
 ## Definition of Done
-- [ ] Can parse valid OTLP/JSON from string
-- [ ] Converts to internal metric types
-- [ ] Unit tests cover all metric types
-- [ ] Unit tests verify error handling
-- [ ] Integration test with sample evaluator output
+- [x] Can parse valid OTLP/JSON from string
+- [x] Converts to internal metric types
+- [x] Unit tests cover all metric types
+- [x] Unit tests verify error handling
+- [x] Integration test with sample evaluator output

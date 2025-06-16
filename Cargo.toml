@@ -8,6 +8,14 @@ license = "MIT"
 repository = "https://github.com/johnwilger/preval"
 readme = "README.md"
 
+[lib]
+name = "preval"
+path = "src/lib.rs"
+
+[[bin]]
+name = "preval"
+path = "src/main.rs"
+
 [lints.rust]
 warnings = "deny"
 

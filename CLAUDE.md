@@ -271,7 +271,7 @@ cross build --release --target x86_64-pc-windows-gnu
 
 - Always make high-quality git commits that explain the _why_ not just the how
 - Commit whenever all tests are passing rather than waiting to complete a full story
-- Use conventional commit format when appropriate
+- NEVER add prefixes to commit message subject lines (no "feat:", "fix:", "chore:", etc.)
 - Keep commits focused and atomic
 
 ## Code Quality Guidelines
@@ -281,3 +281,48 @@ cross build --release --target x86_64-pc-windows-gnu
 - Write tests for all new functionality
 - Document public APIs with rustdoc comments
 - Use descriptive variable and function names
+
+## Type-Safety Techniques
+
+When implementing new functionality, apply these type-driven design principles:
+
+### Parse, Don't Validate
+- Validation should happen once at system boundaries (I/O, JSON parsing, user input)
+- Use newtypes that can only be constructed through validated constructors
+- After parsing, work with validated types that maintain invariants
+
+### Make Illegal States Unrepresentable
+- Use sum types (enums) to represent mutually exclusive states
+- Use newtypes with validation to prevent invalid values
+- Leverage Rust's ownership system to enforce state transitions
+- Example: A `CounterValue` that cannot be negative by construction
+
+### Typestate Pattern
+- Track state transitions in the type system
+- Use phantom types to encode state at compile time
+- Make invalid state transitions compilation errors
+- Example: A builder that won't compile without required fields
+
+### Phantom Types
+- Encode compile-time guarantees without runtime cost
+- Use zero-sized types to track properties
+- Useful for units of measure, validation states, etc.
+
+### Sealed Traits
+- Use the sealed trait pattern to control implementations
+- Ensures exhaustive matching and prevents external implementations
+- Example: `MetricValue` trait that only our metric types can implement
+
+### Test-Driven Type Refinement
+1. Write tests first following TDD
+2. After tests pass, refactor types to make test scenarios impossible
+3. Document which compile-time guarantees replace each test
+4. Remove tests that are made redundant by type constraints
+5. Keep only integration tests at I/O boundaries
+
+### Examples of Type Safety in Practice
+- `MetricName` and `SampleId` cannot be empty strings
+- `CounterValue` cannot be negative
+- `TimeUnixNano` must be positive
+- Metrics must have exactly one type (gauge, counter, or histogram)
+- Required fields are enforced by the type system, not runtime checks

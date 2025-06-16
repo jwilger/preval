@@ -1,7 +1,7 @@
 mod app;
 mod config;
-mod evaluator;
-mod state;
+pub mod evaluator;
+pub mod state;
 mod ui;
 
 use anyhow::Result;
