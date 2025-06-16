@@ -25,3 +25,8 @@ Thumbs.db
 # Node.js
 node_modules/
 .log4brains/
+
+
+# Added by cargo
+
+/target
