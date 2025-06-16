@@ -26,7 +26,7 @@ impl ExitStatus {
     pub fn success(&self) -> bool {
         self.success
     }
-    
+
     /// Exit code if available
     pub fn code(&self) -> Option<i32> {
         self.code
@@ -57,17 +57,15 @@ impl EvaluatorProcess {
         let mut child = Command::new(program)
             .args(args)
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit()) // Let stderr go to terminal
+            .stderr(Stdio::piped()) // Capture stderr to filter out cargo messages
             .stdin(Stdio::null())
             .kill_on_drop(true) // Ensure cleanup
             .spawn()
             .with_context(|| format!("Failed to spawn evaluator: {}", command))?;
 
-        // Get stdout handle
-        let stdout = child
-            .stdout
-            .take()
-            .context("Failed to capture stdout")?;
+        // Get stdout and stderr handles
+        let stdout = child.stdout.take().context("Failed to capture stdout")?;
+        let stderr = child.stderr.take().context("Failed to capture stderr")?;
 
         // Spawn task to read stdout
         let tx = message_tx.clone();
@@ -83,6 +81,34 @@ impl EvaluatorProcess {
             }
         });
 
+        // Spawn task to read stderr and filter cargo messages
+        let tx_stderr = message_tx.clone();
+        tokio::spawn(async move {
+            let reader = BufReader::new(stderr);
+            let mut lines = reader.lines();
+
+            while let Ok(Some(line)) = lines.next_line().await {
+                // Filter out cargo build messages that pollute the terminal
+                if line.trim().starts_with("Compiling")
+                    || line.trim().starts_with("Finished")
+                    || line.trim().starts_with("Running")
+                    || line.trim().contains("target/debug/deps/")
+                    || line.trim().is_empty()
+                {
+                    continue; // Skip cargo build output
+                }
+
+                // Send actual stderr as output (for real errors)
+                if tx_stderr
+                    .send(EvaluatorMessage::Output(format!("stderr: {}", line)))
+                    .await
+                    .is_err()
+                {
+                    break;
+                }
+            }
+        });
+
         // Spawn task to monitor process exit
         let child_id = child.id();
         let tx_exit = message_tx;
@@ -93,7 +119,7 @@ impl EvaluatorProcess {
                 // Wait a bit for the process to potentially exit
                 loop {
                     tokio::time::sleep(std::time::Duration::from_millis(500)).await;
-                    
+
                     // Check if process still exists by trying to send signal 0
                     match std::process::Command::new("kill")
                         .args(["-0", &id.to_string()])
@@ -121,7 +147,10 @@ impl EvaluatorProcess {
 
     /// Kill the evaluator process
     pub async fn kill(&mut self) -> Result<()> {
-        self.child.kill().await.context("Failed to kill evaluator")?;
+        self.child
+            .kill()
+            .await
+            .context("Failed to kill evaluator")?;
         Ok(())
     }
 }

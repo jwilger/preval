@@ -1,5 +1,4 @@
 use crate::state::types::Initialized;
-use std::marker::PhantomData;
 use crate::ui::layout::UiLayout;
 use crate::ui::widgets::{footer::Footer, header::Header, metrics::MetricsView};
 use anyhow::{Context, Result};
@@ -9,6 +8,7 @@ use crossterm::{
 };
 use ratatui::{backend::CrosstermBackend, Terminal};
 use std::io::{self, Stdout};
+use std::marker::PhantomData;
 
 /// Terminal renderer with typestate pattern to ensure proper initialization
 pub(crate) struct Renderer<S> {
@@ -28,22 +28,24 @@ impl Renderer<Uninitialized> {
     }
 
     /// Initialize the terminal and transition to initialized state
-    pub(crate) fn initialize(self) -> Result<(Renderer<Initialized>, Terminal<CrosstermBackend<Stdout>>)> {
+    pub(crate) fn initialize(
+        self,
+    ) -> Result<(Renderer<Initialized>, Terminal<CrosstermBackend<Stdout>>)> {
         // Enable raw mode
         enable_raw_mode().context("Failed to enable raw mode")?;
-        
+
         // Enter alternate screen
         let mut stdout = io::stdout();
         execute!(stdout, EnterAlternateScreen).context("Failed to enter alternate screen")?;
-        
+
         // Create terminal
         let backend = CrosstermBackend::new(stdout);
         let terminal = Terminal::new(backend).context("Failed to create terminal")?;
-        
+
         let renderer = Renderer {
             _state: PhantomData,
         };
-        
+
         Ok((renderer, terminal))
     }
 }
@@ -59,22 +61,27 @@ impl Renderer<Initialized> {
         terminal
             .draw(|frame| {
                 let area = frame.area();
-                
+
                 // Calculate layout
                 match UiLayout::new(area) {
                     Ok(layout) => {
-                        // Render header
-                        let header = if let Some(name) = state.evaluator_name() {
-                            Header::new().evaluator_name(name)
-                        } else {
-                            Header::new()
+                        // Render header - prefer handshake data over evaluator name
+                        let header = match state.handshake() {
+                            Some(handshake) => Header::new().handshake(handshake),
+                            None => {
+                                if let Some(name) = state.evaluator_name() {
+                                    Header::new().evaluator_name(name)
+                                } else {
+                                    Header::new()
+                                }
+                            }
                         };
                         frame.render_widget(header, layout.header);
-                        
+
                         // Render content (metrics)
                         let metrics_view = MetricsView::new(state.metrics(), state.status());
                         frame.render_widget(metrics_view, layout.content);
-                        
+
                         // Render footer
                         let footer = Footer::new().paused(state.is_paused());
                         frame.render_widget(footer, layout.footer);
@@ -83,15 +90,16 @@ impl Renderer<Initialized> {
                         // Terminal too small, show error
                         let msg = "Terminal too small!";
                         frame.render_widget(
-                            ratatui::widgets::Paragraph::new(msg)
-                                .style(ratatui::style::Style::default().fg(ratatui::style::Color::Red)),
+                            ratatui::widgets::Paragraph::new(msg).style(
+                                ratatui::style::Style::default().fg(ratatui::style::Color::Red),
+                            ),
                             area,
                         );
                     }
                 }
             })
             .context("Failed to draw frame")?;
-        
+
         Ok(())
     }
 }
