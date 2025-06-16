@@ -24,7 +24,7 @@ impl EventHandler {
                 .context("Failed to poll for terminal events")?
             {
                 let event = event::read().context("Failed to read terminal event")?;
-                
+
                 if let Some(action) = self.handle_event(event)? {
                     // Send action to main app
                     if self.action_tx.send(action).await.is_err() {
@@ -33,11 +33,11 @@ impl EventHandler {
                     }
                 }
             }
-            
+
             // Allow tokio to process other tasks
             tokio::task::yield_now().await;
         }
-        
+
         Ok(())
     }
 
@@ -65,13 +65,13 @@ impl EventHandler {
             // Quit on 'q' or Ctrl+C
             (KeyCode::Char('q'), KeyModifiers::NONE) => Some(UiAction::Quit),
             (KeyCode::Char('c'), KeyModifiers::CONTROL) => Some(UiAction::Quit),
-            
+
             // Pause/resume on space
             (KeyCode::Char(' '), KeyModifiers::NONE) => Some(UiAction::TogglePause),
-            
+
             // Force refresh on Ctrl+L
             (KeyCode::Char('l'), KeyModifiers::CONTROL) => Some(UiAction::Refresh),
-            
+
             _ => None, // Ignore other keys
         }
     }
@@ -85,14 +85,14 @@ mod tests {
     async fn test_quit_on_q_key() {
         let (tx, _rx) = mpsc::channel(1);
         let handler = EventHandler::new(tx);
-        
+
         let key_event = KeyEvent {
             code: KeyCode::Char('q'),
             modifiers: KeyModifiers::NONE,
             kind: event::KeyEventKind::Press,
             state: event::KeyEventState::NONE,
         };
-        
+
         let action = handler.handle_key_event(key_event);
         assert_eq!(action, Some(UiAction::Quit));
     }
@@ -101,14 +101,14 @@ mod tests {
     async fn test_quit_on_ctrl_c() {
         let (tx, _rx) = mpsc::channel(1);
         let handler = EventHandler::new(tx);
-        
+
         let key_event = KeyEvent {
             code: KeyCode::Char('c'),
             modifiers: KeyModifiers::CONTROL,
             kind: event::KeyEventKind::Press,
             state: event::KeyEventState::NONE,
         };
-        
+
         let action = handler.handle_key_event(key_event);
         assert_eq!(action, Some(UiAction::Quit));
     }
@@ -117,14 +117,14 @@ mod tests {
     async fn test_toggle_pause_on_space() {
         let (tx, _rx) = mpsc::channel(1);
         let handler = EventHandler::new(tx);
-        
+
         let key_event = KeyEvent {
             code: KeyCode::Char(' '),
             modifiers: KeyModifiers::NONE,
             kind: event::KeyEventKind::Press,
             state: event::KeyEventState::NONE,
         };
-        
+
         let action = handler.handle_key_event(key_event);
         assert_eq!(action, Some(UiAction::TogglePause));
     }

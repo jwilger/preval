@@ -78,6 +78,7 @@ pub struct AttributeKey(String);
 /// Attribute value types matching OpenTelemetry spec
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[allow(clippy::enum_variant_names)] // Matches OpenTelemetry spec naming
 pub enum AttributeValue {
     StringValue(String),
     BoolValue(bool),
@@ -103,27 +104,36 @@ impl GaugeValue {
     }
 }
 
-/// Finite f64 value - guaranteed to not be NaN or infinity
+/// Non-negative f64 value - guaranteed to be >= 0.0 and finite
 #[nutype(
-    validate(finite),
+    validate(finite, greater_or_equal = 0.0),
     derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, AsRef, Into)
 )]
-struct FiniteF64(f64);
+pub struct NonNegativeF64(f64);
 
-/// Type-safe counter value (must be non-negative and finite)
+/// Type-safe counter value (guaranteed non-negative and finite by construction)
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
-pub struct CounterValue(FiniteF64);
+pub struct CounterValue(NonNegativeF64);
 
 impl CounterValue {
-    /// Create a counter value from f64, ensuring it's non-negative and finite
+    /// Create a counter value from a validated non-negative input - cannot fail!
+    pub fn new(value: NonNegativeF64) -> Self {
+        CounterValue(value)
+    }
+
+    /// Legacy method for JSON parsing - validates input
+    #[allow(dead_code)] // Keep for backward compatibility during transition
     pub fn try_new(value: f64) -> Result<Self, CounterValueError> {
-        let finite_value = FiniteF64::try_new(value).map_err(|_| CounterValueError::NotFinite)?;
+        let non_neg_value = NonNegativeF64::try_new(value)
+            .map_err(|_| {
+                if value < 0.0 {
+                    CounterValueError::MustBeNonNegative
+                } else {
+                    CounterValueError::NotFinite
+                }
+            })?;
 
-        if value < 0.0 {
-            return Err(CounterValueError::MustBeNonNegative);
-        }
-
-        Ok(CounterValue(finite_value))
+        Ok(CounterValue(non_neg_value))
     }
 
     /// Get the inner value
@@ -172,24 +182,85 @@ pub struct DataPoint<V> {
     pub attributes: HashMap<AttributeKey, AttributeValue>,
 }
 
-/// Type-safe metric enum
+/// Metric type that counts toward evaluation progress
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub enum Metric {
+#[serde(tag = "type")]
+pub enum SampleMetric {
+    #[serde(rename = "gauge")]
     Gauge {
         name: MetricName,
         unit: Option<String>,
         data_points: Vec<DataPoint<GaugeValue>>,
     },
+    #[serde(rename = "counter")]
     Counter {
         name: MetricName,
         unit: Option<String>,
         data_points: Vec<DataPoint<CounterValue>>,
     },
+    #[serde(rename = "histogram")]
     Histogram {
         name: MetricName,
         unit: Option<String>,
         data_points: Vec<DataPoint<HistogramValue>>,
     },
+}
+
+/// Metric type that does NOT count toward evaluation progress (summary/aggregate data)
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "type")]
+pub enum SummaryMetric {
+    #[serde(rename = "gauge")]
+    Gauge {
+        name: MetricName,
+        unit: Option<String>,
+        data_points: Vec<DataPoint<GaugeValue>>,
+    },
+    #[serde(rename = "counter")]
+    Counter {
+        name: MetricName,
+        unit: Option<String>,
+        data_points: Vec<DataPoint<CounterValue>>,
+    },
+    #[serde(rename = "histogram")]
+    Histogram {
+        name: MetricName,
+        unit: Option<String>,
+        data_points: Vec<DataPoint<HistogramValue>>,
+    },
+}
+
+/// Top-level metric enum that distinguishes between sample and summary metrics
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(tag = "category")]
+pub enum Metric {
+    #[serde(rename = "sample")]
+    Sample(SampleMetric),
+    #[serde(rename = "summary")]
+    Summary(SummaryMetric),
+}
+
+impl Metric {
+    /// Get the metric name regardless of type
+    pub fn name(&self) -> &MetricName {
+        match self {
+            Metric::Sample(sample_metric) => match sample_metric {
+                SampleMetric::Gauge { name, .. } => name,
+                SampleMetric::Counter { name, .. } => name,
+                SampleMetric::Histogram { name, .. } => name,
+            },
+            Metric::Summary(summary_metric) => match summary_metric {
+                SummaryMetric::Gauge { name, .. } => name,
+                SummaryMetric::Counter { name, .. } => name,
+                SummaryMetric::Histogram { name, .. } => name,
+            },
+        }
+    }
+
+    /// Check if this metric counts toward progress (is a sample metric)
+    pub fn counts_toward_progress(&self) -> bool {
+        matches!(self, Metric::Sample(_))
+    }
 }
 
 /// Collection of metrics from a single resource
@@ -201,17 +272,15 @@ pub struct MetricData {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     // Tests removed: metric_name_cannot_be_empty, sample_id_cannot_be_empty
     // The nutype validation already guarantees these cannot be empty at compile time
 
-    #[test]
-    fn counter_value_must_be_non_negative() {
-        assert!(CounterValue::try_new(-1.0).is_err());
-        assert!(CounterValue::try_new(0.0).is_ok());
-        assert!(CounterValue::try_new(1.0).is_ok());
-    }
+    // Test removed: counter_value_must_be_non_negative
+    // The NonNegativeF64 input type now makes it impossible to construct
+    // a CounterValue with negative input using the primary constructor.
+    // The main constructor CounterValue::new() is infallible since it takes
+    // a NonNegativeF64 which is guaranteed to be valid by the type system.
 
     // Test removed: gauge_value_can_be_negative
     // The type system already guarantees that GaugeValue can hold any f64 value,

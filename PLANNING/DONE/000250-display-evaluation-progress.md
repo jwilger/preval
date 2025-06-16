@@ -10,13 +10,13 @@ As a user running test evaluations, I want to see real-time progress of all samp
 - Enables better time management with completion estimates
 
 ## Acceptance Criteria
-- [ ] Display progress bar showing X of Y samples completed
-- [ ] Show current sample being processed
-- [ ] Calculate and display ETA based on completion rate
-- [ ] List recent completed samples with summary metrics
-- [ ] Indicate failed samples clearly
-- [ ] Update smoothly without flickering
-- [ ] Group related metrics by sample.id attribute
+- [x] Display progress bar showing X of Y samples completed
+- [x] Show current sample being processed
+- [x] Calculate and display ETA based on completion rate
+- [x] List recent completed samples with summary metrics
+- [x] Indicate failed samples clearly
+- [x] Update smoothly without flickering
+- [x] Group related metrics by sample.id attribute
 
 ## Technical Notes
 - Use sample.id attribute from OTLP data to group metrics
@@ -44,10 +44,10 @@ As a user running test evaluations, I want to see real-time progress of all samp
 ```
 
 ## Definition of Done
-- [ ] Progress tracking works accurately
-- [ ] ETA calculation is reasonable
-- [ ] Failed samples are clearly visible
-- [ ] UI remains responsive during updates
-- [ ] Memory usage stays constant (no leaks)
-- [ ] Review all tests and refactor to eliminate via type constraints where possible
-- [ ] Audit and restrict visibility of all code to minimum required scope
+- [x] Progress tracking works accurately
+- [x] ETA calculation is reasonable
+- [x] Failed samples are clearly visible
+- [x] UI remains responsive during updates
+- [x] Memory usage stays constant (no leaks)
+- [x] Review all tests and refactor to eliminate via type constraints where possible
+- [x] Audit and restrict visibility of all code to minimum required scope

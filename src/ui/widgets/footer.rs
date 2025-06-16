@@ -1,7 +1,4 @@
-use ratatui::{
-    prelude::*,
-    widgets::Paragraph,
-};
+use ratatui::{prelude::*, widgets::Paragraph};
 
 /// Footer widget showing keyboard shortcuts
 pub(crate) struct Footer {

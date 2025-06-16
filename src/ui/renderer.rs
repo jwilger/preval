@@ -1,6 +1,6 @@
 use crate::state::types::Initialized;
 use crate::ui::layout::UiLayout;
-use crate::ui::widgets::{footer::Footer, header::Header, metrics::MetricsView};
+use crate::ui::widgets::{footer::Footer, header::Header, progress::ProgressView};
 use anyhow::{Context, Result};
 use crossterm::{
     execute,
@@ -78,9 +78,9 @@ impl Renderer<Initialized> {
                         };
                         frame.render_widget(header, layout.header);
 
-                        // Render content (metrics)
-                        let metrics_view = MetricsView::new(state.metrics(), state.status());
-                        frame.render_widget(metrics_view, layout.content);
+                        // Render content (progress)
+                        let progress_view = ProgressView::new(state);
+                        frame.render_widget(progress_view, layout.content);
 
                         // Render footer
                         let footer = Footer::new().paused(state.is_paused());

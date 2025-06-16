@@ -3,3 +3,4 @@
 pub(crate) mod footer;
 pub(crate) mod header;
 pub(crate) mod metrics;
+pub(crate) mod progress;

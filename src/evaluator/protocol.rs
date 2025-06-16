@@ -88,12 +88,30 @@ pub enum EvaluationMode {
     Continuous,
 }
 
-/// Information about the evaluator
+/// Non-empty evaluator name
+#[nutype(
+    sanitize(trim),
+    validate(not_empty, len_char_max = 255),
+    derive(Debug, Clone, PartialEq, Eq, AsRef, Display, Serialize, Deserialize)
+)]
+pub struct EvaluatorNameProtocol(String);
+
+/// Information about the evaluator with validated required fields
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EvaluatorInfo {
-    pub name: String, // Keep as String for JSON parsing, validate at boundaries
+    #[serde(deserialize_with = "deserialize_evaluator_name")]
+    pub name: EvaluatorNameProtocol,
     pub description: Option<String>,
     pub version: Option<String>,
+}
+
+/// Custom deserializer for evaluator name that validates non-empty
+fn deserialize_evaluator_name<'de, D>(deserializer: D) -> Result<EvaluatorNameProtocol, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    EvaluatorNameProtocol::try_new(s).map_err(serde::de::Error::custom)
 }
 
 /// Execution plan for the evaluation
@@ -111,11 +129,22 @@ pub struct MetricDefinition {
     pub unit: Option<String>,
 }
 
+/// Valid message types for protocol messages
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MessageType {
+    Handshake,
+    #[allow(dead_code)] // Future message types
+    Metrics,
+    #[allow(dead_code)] // Future message types
+    Summary,
+}
+
 /// Handshake message sent by evaluator at startup
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Handshake {
     #[serde(rename = "type")]
-    pub msg_type: String,
+    pub msg_type: MessageType,
     pub mode: EvaluationMode,
     pub version: String, // Will be converted to ProtocolVersion after parsing
     pub evaluator: EvaluatorInfo,
@@ -138,7 +167,7 @@ pub struct ValidatedHandshake {
 /// Validated evaluator information
 #[derive(Debug, Clone)]
 pub struct ValidatedEvaluatorInfo {
-    pub name: String, // Already validated to be non-empty by JSON requirements
+    pub name: EvaluatorNameProtocol, // Already validated by custom deserializer
     pub description: Option<EvaluatorDescription>,
     #[allow(dead_code)] // Used in future stories
     pub version: Option<String>,
@@ -198,10 +227,7 @@ impl ValidatedHandshake {
 
 impl ValidatedEvaluatorInfo {
     fn parse(info: EvaluatorInfo) -> Result<Self, ValidationError> {
-        if info.name.trim().is_empty() {
-            return Err(ValidationError::EmptyEvaluatorName);
-        }
-
+        // Name is already validated by the custom deserializer
         let description = info
             .description
             .map(EvaluatorDescription::try_new)
@@ -259,8 +285,9 @@ pub enum ValidationError {
     #[error("protocol version is invalid: {0}")]
     InvalidVersion(String),
 
-    #[error("evaluator name cannot be empty")]
-    EmptyEvaluatorName,
+    // Error removed: EmptyEvaluatorName  
+    // The EvaluatorNameProtocol type with custom deserializer now enforces
+    // non-empty names at the JSON parsing level, making this error impossible.
 
     #[error("evaluator description is invalid: {0}")]
     InvalidDescription(String),

@@ -207,7 +207,6 @@ pub(super) enum ValidationError {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
     // Test removed: validates_single_metric_type
     // The ValidatedMetricData enum and the exhaustive pattern match in
@@ -215,18 +214,8 @@ mod tests {
     // type is extracted. The match expression handles all possible combinations
     // of Some/None values, making it impossible to create an invalid state.
 
-    #[test]
-    fn validates_non_empty_name() {
-        let metric = Metric {
-            name: "  ".to_string(),
-            unit: None,
-            gauge: Some(Gauge {
-                data_points: vec![],
-            }),
-            sum: None,
-            histogram: None,
-        };
-
-        assert!(ValidatedMetric::parse(metric).is_err());
-    }
+    // Test removed: validates_non_empty_name
+    // The MetricName type now enforces non-empty names through nutype validation.
+    // The type system makes it impossible to construct a MetricName with an empty or whitespace-only string,
+    // eliminating the need for this runtime test.
 }

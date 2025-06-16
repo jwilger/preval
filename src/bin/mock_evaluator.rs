@@ -48,7 +48,7 @@ fn main() {
 
     // Generate metrics for each sample
     let mut total_tokens = 0.0;
-    
+
     for i in 1..=10 {
         let sample_id = format!("sample-{:03}", i);
         let accuracy = 0.7 + (i as f64 * 0.02); // 0.72 to 0.90
@@ -169,11 +169,9 @@ fn main() {
 
 fn get_timestamp_nanos() -> String {
     use std::time::{SystemTime, UNIX_EPOCH};
-    
-    let duration = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap();
-    
+
+    let duration = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
+
     let nanos = duration.as_secs() * 1_000_000_000 + duration.subsec_nanos() as u64;
     nanos.to_string()
 }
