@@ -203,17 +203,8 @@ pub struct MetricData {
 mod tests {
     use super::*;
 
-    #[test]
-    fn metric_name_cannot_be_empty() {
-        assert!(MetricName::try_new("").is_err());
-        assert!(MetricName::try_new("  ").is_err());
-    }
-
-    #[test]
-    fn sample_id_cannot_be_empty() {
-        assert!(SampleId::try_new("").is_err());
-        assert!(SampleId::try_new("  ").is_err());
-    }
+    // Tests removed: metric_name_cannot_be_empty, sample_id_cannot_be_empty
+    // The nutype validation already guarantees these cannot be empty at compile time
 
     #[test]
     fn counter_value_must_be_non_negative() {

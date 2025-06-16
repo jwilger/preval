@@ -58,3 +58,5 @@ As a user, I want PrEval to understand what my evaluator will do before it start
 - [ ] Graceful handling of missing/invalid handshake
 - [ ] Integration test with mock evaluator
 - [ ] Update example evaluator to send handshake
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

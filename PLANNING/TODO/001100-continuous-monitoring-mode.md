@@ -66,3 +66,5 @@ As a developer debugging LLM behavior, I want to continuously monitor evaluation
 - [ ] Export functionality works correctly
 - [ ] Manual stop preserves all data
 - [ ] Long-running test confirms stability
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

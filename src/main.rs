@@ -1,7 +1,7 @@
 mod app;
 mod config;
-pub mod evaluator;
-pub mod state;
+pub(crate) mod evaluator;
+pub(crate) mod state;
 mod ui;
 
 use anyhow::Result;

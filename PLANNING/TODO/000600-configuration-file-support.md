@@ -56,3 +56,12 @@ As a developer, I want to interactively choose which evaluations to run and thei
 4. Space toggles checkboxes, arrow keys change radio buttons
 5. Enter starts evaluation with current selections
 6. Screen transitions to progress view
+
+## Definition of Done
+- [ ] Selection interface is intuitive and responsive
+- [ ] Evaluator discovery works across platforms
+- [ ] Settings are remembered between sessions
+- [ ] Validation prevents invalid configurations
+- [ ] Keyboard navigation works smoothly
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

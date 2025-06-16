@@ -47,3 +47,12 @@ Sample Performance:
 - Updates should animate smoothly as new results come in
 - Previous run data should be loaded at startup
 - If evaluation is aborted, partial comparisons should still be visible
+
+## Definition of Done
+- [ ] Comparison view displays current vs previous metrics
+- [ ] Delta calculations work correctly
+- [ ] Previous run data loads automatically
+- [ ] UI updates smoothly during evaluation
+- [ ] Handles missing previous run gracefully
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

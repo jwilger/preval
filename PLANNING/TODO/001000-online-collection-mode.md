@@ -76,3 +76,12 @@ Summary saved to: ./test-results/eval_20240115_143245_summary.json
 - Override with environment variables (PREVAL_*)
 - Command-line flags take precedence
 - Document all options clearly
+
+## Definition of Done
+- [ ] --no-tui mode works without interface
+- [ ] Exit codes reflect evaluation results
+- [ ] Reports generate automatically
+- [ ] CI-friendly output format
+- [ ] Works in non-TTY environments
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

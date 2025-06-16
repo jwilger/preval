@@ -87,4 +87,13 @@ evaluators:
     quality:
       - sentiment_analysis
       - grammar_check
+
+## Definition of Done
+- [ ] Multiple evaluators run successfully
+- [ ] Each evaluator's output is correctly displayed
+- [ ] Protocol compatibility is validated
+- [ ] Custom evaluator paths work
+- [ ] Discovery mechanism is reliable
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope
 ```

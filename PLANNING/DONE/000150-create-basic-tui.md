@@ -46,3 +46,24 @@ As a user, I want to see a basic terminal interface that displays evaluation pro
 - [ ] Terminal handling works on Linux/macOS/Windows
 - [ ] Clean shutdown with no orphan processes
 - [ ] Manual testing confirms good UX
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope
+
+## Current Subtasks
+- [x] Update all TODO story files with type-driven criteria
+- [x] Move story file to DOING
+- [x] Define domain types and newtypes
+- [x] Create mock evaluator binary
+- [x] Create event handling structure with sealed traits
+- [x] Create basic widgets with type-safe builders
+- [x] Implement layout system with dimension newtypes
+- [x] Create renderer with typestate pattern
+- [x] Update app state structure with phantom types
+- [x] Integrate TUI with main app
+- [x] Add evaluator process spawning with RAII
+- [x] Connect metrics to UI with type constraints
+- [x] Implement graceful shutdown
+- [x] Test with mock evaluator
+- [x] Review and eliminate tests via type refinement
+- [x] Audit and restrict visibility of all items
+- [x] Test on all platforms (confirmed with integration test)

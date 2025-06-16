@@ -1,3 +1,6 @@
 // UI module for terminal user interface components
 
-// TODO: Add UI components as the application develops
+pub(crate) mod events;
+pub(crate) mod layout;
+pub(crate) mod renderer;
+pub(crate) mod widgets;

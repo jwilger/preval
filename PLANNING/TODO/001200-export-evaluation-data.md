@@ -110,3 +110,12 @@ Generate and include schema documentation:
 - Relationships between entities
 - Example values
 - Version changelog
+
+## Definition of Done
+- [ ] All export formats work correctly
+- [ ] Exported data is complete and valid
+- [ ] Schema documentation is accurate
+- [ ] Large datasets export efficiently
+- [ ] CLI export options function properly
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

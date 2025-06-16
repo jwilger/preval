@@ -69,3 +69,5 @@ reporting:
 - [ ] Dependencies are respected
 - [ ] Aggregation uses configured weights
 - [ ] Example suites provided in docs
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

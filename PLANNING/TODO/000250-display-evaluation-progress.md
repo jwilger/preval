@@ -49,3 +49,5 @@ As a user running test evaluations, I want to see real-time progress of all samp
 - [ ] Failed samples are clearly visible
 - [ ] UI remains responsive during updates
 - [ ] Memory usage stays constant (no leaks)
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

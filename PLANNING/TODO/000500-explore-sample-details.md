@@ -61,3 +61,12 @@ As a developer debugging evaluation results, I want to drill down into specific 
 3. Arrow down to specific run, Enter to see details
 4. Esc returns to previous level
 5. Details can be copied or exported
+
+## Definition of Done
+- [ ] Navigation between samples and runs works smoothly
+- [ ] Detail view displays all relevant information
+- [ ] Text differences are clearly highlighted
+- [ ] Clipboard copy functionality works
+- [ ] Large text content scrolls properly
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

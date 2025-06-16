@@ -16,6 +16,10 @@ path = "src/lib.rs"
 name = "preval"
 path = "src/main.rs"
 
+[[bin]]
+name = "mock_evaluator"
+path = "src/bin/mock_evaluator.rs"
+
 [lints.rust]
 warnings = "deny"
 

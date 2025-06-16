@@ -53,3 +53,5 @@ As a user running multiple evaluators, I want to see aggregate metrics across al
 - [ ] UI clearly shows system health
 - [ ] Reports include aggregate data
 - [ ] Performance is acceptable with many metrics
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope

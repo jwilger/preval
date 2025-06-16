@@ -64,3 +64,5 @@ As a user, I want to save evaluation results in JSON and HTML formats so that I 
 - [ ] Reports generate without errors
 - [ ] Output directory is created if missing
 - [ ] Integration test verifies report generation
+- [ ] Review all tests and refactor to eliminate via type constraints where possible
+- [ ] Audit and restrict visibility of all code to minimum required scope
